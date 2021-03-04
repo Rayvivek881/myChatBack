@@ -63,6 +63,15 @@ routerLS.post('/login', async(req, res) =>{
     }
 });
 
+routerLS.get('/logout', (req, res) => {
+    let options = {
+        maxAge: 10,
+        httpOnly: true,
+    }
+    res.cookie('user_id', '' , options)
+    res.send({done: true});
+})
+
 routerLS.get('/forgetpass', async (req, res) =>{
     const { emailorusername } = req.body;
     let result, flag;
@@ -108,13 +117,12 @@ routerLS.patch('/forgetpass', async(req, res) =>{
 
 routerLS.post('/home', Authentication, async(req, res) => {
     const { myid } = req.user;
-    const result = await UserData.findById(myid).select({password: false, friendChats: false});
+    const result = await UserData.findById(myid).select({password: false, friendChats: false, email: false});
     const obj = {
         ...result,
         newmessage: result.newmessage.length,
-        friendrequest: result.friendrequest.length
     }
-    res.send({isVarified: cookieobj.isVarified, data: obj});
+    res.send({isVarified: true, data: obj});
 });
 
 module.exports = routerLS;

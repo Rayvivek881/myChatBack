@@ -10,16 +10,16 @@ routerFriend.get('/profile', async(req, res) => {
 })
 
 routerFriend.put('/friendreq', async(req, res) => {
-    const {myid, friendid} = req.query;
+    const {myid, friendid, name} = req.query;
     const result = await UserData.updateOne({_id: friendid}, {
-        $push: {friendrequest: myid}
+        $push: {friendrequest: [myid, name]}
     }, { useFindAndModify: false })
     res.send({status: 'added'});
 })
 
 routerFriend.put('/friendacc', Authentication, async (req, res) => {
     const {myid, friendid} = req.query;
-    const data = await UserData.find({$or: [{_id: myid}, {_id: friendid}]}).select({friendChats: true, fullname: true});
+    const data = await UserData.find({$or: [{_id: myid}, {_id: friendid}]}).select({friendChats: true, fullname: true, status: true});
     let mydata, frienddata;
     if (data[0]._id == myid) {
         mydata = data[0];
@@ -51,12 +51,12 @@ routerFriend.put('/friendacc', Authentication, async (req, res) => {
     }, { useFindAndModify: false });
     const result2 = await UserData.updateOne({_id: myid}, {
         $push : {
-            friends: friendid
+            friends: [friendid, frienddata.fullname, frienddata.status]
         }
     }, { useFindAndModify: false });
     const result6 = await UserData.updateOne({_id: friendid}, {
         $push : {
-            friends: myid
+            friends: [myid, mydata.fullname, mydata.status]
         }
     }, { useFindAndModify: false });
     const result1 = await UserData.updateOne({_id: friendid}, {

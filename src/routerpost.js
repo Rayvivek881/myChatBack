@@ -6,9 +6,10 @@ const UserData = require('../models/auth');
 
 routerPost.post('/createpost', Authentication, async (req, res) => {
     const { myid } = req.user;
-    const {image, Title, data} = req.body;
+    const {image, Title, data, name} = req.body;
     const newpost = new Post({
         image,
+        name,
         Title,
         data,
         userid: myid
@@ -96,4 +97,8 @@ routerPost.patch('/editpost', Authentication, async (req, res) => {
     res.send({message: 'post edited'})
 });
 
+routerPost.post('/allposts', Authentication, async(req, res) => {
+    const result = await Post.find();
+    res.send({allposts: result});
+})
 module.exports = routerPost;
