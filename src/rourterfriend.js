@@ -9,8 +9,9 @@ routerFriend.get('/profile', async(req, res) => {
     res.send({isEditable: isEditable, data: result});
 })
 
-routerFriend.put('/friendreq', async(req, res) => {
-    const {myid, friendid, name} = req.query;
+routerFriend.put('/friendreq', Authentication, async(req, res) => {
+    const {myid} = req.user;
+    const {friendid, name} = req.query;
     const result = await UserData.updateOne({_id: friendid}, {
         $push: {friendrequest: [myid, name]}
     }, { useFindAndModify: false })
@@ -18,7 +19,7 @@ routerFriend.put('/friendreq', async(req, res) => {
 })
 
 routerFriend.put('/friendacc', Authentication, async (req, res) => {
-    const {myid, friendid} = req.query;
+    const {friendid} = req.query, {myid} = req.user;
     const data = await UserData.find({$or: [{_id: myid}, {_id: friendid}]}).select({friendChats: true, fullname: true, status: true});
     let mydata, frienddata;
     if (data[0]._id == myid) {
@@ -106,16 +107,6 @@ routerFriend.put('/friendmassage', Authentication, async (req, res) => {
     res.send({data: result.friendChats[friendid]})
 })
 
-routerFriend.get('/friends', Authentication, async(req, res) => {
-    const { myid } = req.user;
-    const result = await UserData.findById(myid).select({friendChats: true});
-    let data = [];
-    for(var i in result.friendChats) {
-        data.push(result.friendChats[i]);
-    }
-    res.send({data: data})
-});
-
 routerFriend.get('/newchats', Authentication, async(req, res) => {
     const { myid } = req.user;
     const result = await UserData.findById(myid).select({friendChats: true});
@@ -184,6 +175,15 @@ routerFriend.patch('/unfriend', Authentication, async (req, res) => {
         }
     }, { useFindAndModify: false });
     res.send({});
+})
+
+routerFriend.delete('/friendreq', Authentication, async(req, res) => {
+    const {myid} = req.user;
+    const {friendid, name} = req.query;
+    const result = await UserData.updateOne({_id: myid}, {
+        $pull: {friendrequest: [friendid, name]}
+    }, { useFindAndModify: false })
+    res.send({status: 'added'});
 })
 
 module.exports = routerFriend;
