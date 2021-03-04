@@ -5,12 +5,12 @@ const UserData = require('../models/auth');
 const IsOkName = require('./middleware/editDistance')
 
 routersearch.post('/search', async (req, res) => {
-    const {myid, searchdata} = req.body;
+    const {search} = req.body;
     let data = [];
     const result = await UserData.find()
-        .select({fullname: true, image: true, username: true});
+        .select({fullname: true,});
     for (let index = 0; index < result.length; index++) {
-        if (IsOkName(searchdata, result[i].fullname)) {
+        if (IsOkName(search, result[i].fullname)) {
             data.push(result[i]);
         }
     }
