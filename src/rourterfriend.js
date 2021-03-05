@@ -42,30 +42,33 @@ routerFriend.put('/friendacc', Authentication, async (req, res) => {
         name: mydata.fullname,
         chats: []
     }
-    const result = await UserData.updateOne({_id: myid}, {
-        $set : {
-            friendChats: {
-                ...mydata.friendChats,
-                friendid: mynewdata
-            }
-        }
-    }, { useFindAndModify: false });
     const result2 = await UserData.updateOne({_id: myid}, {
         $push : {
-            friends: [friendid, frienddata.fullname, frienddata.status]
+            friends: JSON.stringify([friendid, frienddata.fullname, frienddata.status])
         }
     }, { useFindAndModify: false });
     const result6 = await UserData.updateOne({_id: friendid}, {
         $push : {
-            friends: [myid, mydata.fullname, mydata.status]
+            friends: JSON.stringify([myid, mydata.fullname, mydata.status])
         }
     }, { useFindAndModify: false });
+    console.log('accpting....');
+    const pata = {
+        ...mydata.friendChats,
+            friendid: mynewdata
+    }
+    const result = await UserData.updateOne({_id: myid}, {
+        $set : {
+            friendChats: pata
+        }
+    }, { useFindAndModify: false });
+    const pata1 = {
+        ...frienddata.friendChats,
+        myid: friendsnewdata
+    }
     const result1 = await UserData.updateOne({_id: friendid}, {
         $set : {
-            friendChats: {
-                ...frienddata.friendChats,
-                myid: friendsnewdata
-            }
+            friendChats: pata1
         }
     }, { useFindAndModify: false });
     res.send({});
@@ -180,8 +183,9 @@ routerFriend.patch('/unfriend', Authentication, async (req, res) => {
 routerFriend.delete('/friendreq', Authentication, async(req, res) => {
     const {myid} = req.user;
     const {friendid, name} = req.query;
+    console.log(req.query);
     const result = await UserData.updateOne({_id: myid}, {
-        $pull: {friendrequest: [friendid, name]}
+        $pull: {friendrequest: JSON.stringify([friendid, name])}
     }, { useFindAndModify: false })
     res.send({status: 'added'});
 })
