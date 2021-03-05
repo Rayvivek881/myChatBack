@@ -13,8 +13,8 @@ routerFriend.put('/friendreq', Authentication, async(req, res) => {
     const {myid} = req.user;
     const {friendid, name} = req.query;
     const result = await UserData.updateOne({_id: friendid}, {
-        $push: {friendrequest: [myid, name]}
-    }, { useFindAndModify: false })
+        $addToSet: {friendrequest: JSON.stringify([myid, name])}
+    }, { useFindAndModify: false }) 
     res.send({status: 'added'});
 })
 

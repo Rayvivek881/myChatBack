@@ -97,7 +97,7 @@ routerPost.patch('/editpost', Authentication, async (req, res) => {
     res.send({message: 'post edited'})
 });
 
-routerPost.post('/allposts', Authentication, async(req, res) => {
+routerPost.post('/allposts', async(req, res) => {
     const result = await Post.find();
     res.send({allposts: result});
 })

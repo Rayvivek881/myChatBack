@@ -115,7 +115,7 @@ routerLS.patch('/forgetpass', async(req, res) =>{
     res.send({isVarified: true, massage: `you can login with new password`})
 })
 
-routerLS.post('/home', Authentication, async(req, res) => {
+routerLS.post('/home',Authentication, async(req, res) => {
     const { myid } = req.user;
     const result = await UserData.findById(myid).select({password: false, friendChats: false, email: false});
     const obj = {
