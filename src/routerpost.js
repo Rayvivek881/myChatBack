@@ -35,7 +35,7 @@ routerPost.get('/mypost/:id',  async (req, res) => {
 })
 
 routerPost.delete('/mypost', Authentication, async (req, res) => {
-    const { myid } = req.user, { postid } = req.quary;
+    const { myid } = req.user, { postid } = req.query;
     const result = await Post.deleteOne({_id: postid});
     const result1 = await UserData.updateOne({_id: myid}, {
         $pull: {
@@ -46,7 +46,7 @@ routerPost.delete('/mypost', Authentication, async (req, res) => {
 });
 
 routerPost.put('/like', Authentication, async(req, res) => {
-    const { myid } = req.user, { postid } = req.quary;
+    const { myid } = req.user, { postid } = req.query;
     const result = await Post.updateOne({_id: postid}, {
         $push : {
             likes: myid
@@ -56,7 +56,7 @@ routerPost.put('/like', Authentication, async(req, res) => {
 })
 
 routerPost.put('/rmlike', Authentication, async(req, res) => {
-    const { myid } = req.user, { postid } = req.quary;
+    const { myid } = req.user, { postid } = req.query;
     const result = await Post.updateOne({_id: postid}, {
         $pull : {
             likes: myid

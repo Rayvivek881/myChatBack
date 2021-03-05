@@ -10,10 +10,11 @@ routersearch.post('/search', async (req, res) => {
     const result = await UserData.find()
         .select({fullname: true});
     for (let index = 0; index < result.length; index++) {
-        if (IsOkName(search, result[i].fullname)) {
-            data.push(result[i]);
+        if (IsOkName(search, result[index].fullname)) {
+            data.push(result[index]);
         }
     }
+    console.log(data);
     res.send({matches: data})
 });
 

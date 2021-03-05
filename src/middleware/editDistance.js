@@ -10,13 +10,13 @@ const IsOkName = (s1, s2) => {
     const lsts2 = s2.split(' ');
     let ans = 0, ans1 = 0;
     for (var i in lsts1) {
-        if (lsts2.indexOf(i) != -1) {
+        if (lsts2.indexOf(lsts1[i]) != -1) {
             ans += 2;
         }
     }
     ans = Math.ceil((ans / (lsts2.length + lsts1.length)) * 100);
     for (var i in lsts2) {
-        if (lsts1.indexOf(i) != -1) {
+        if (lsts1.indexOf(lsts2[i]) != -1) {
             ans1 += 2;
         }
     }
