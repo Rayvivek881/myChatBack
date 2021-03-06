@@ -2,6 +2,7 @@ const express = require("express");
 const routerFriend = new express.Router();
 const UserData = require('../models/auth');
 const Authentication = require('./middleware/authentication')
+const Chat = require('../models/Chatting');
 
 routerFriend.get('/profile', async(req, res) => {
     const {username, isEditable} = req.body;
@@ -19,88 +20,58 @@ routerFriend.put('/friendreq', Authentication, async(req, res) => {
 })
 
 routerFriend.put('/friendacc', Authentication, async (req, res) => {
-    const {friendid} = req.query, {myid} = req.user;
-    const data = await UserData.find({$or: [{_id: myid}, {_id: friendid}]}).select({friendChats: true, fullname: true, status: true});
-    let mydata, frienddata;
-    if (data[0]._id == myid) {
-        mydata = data[0];
-        frienddata = data[1];
-    } else {
-        mydata = data[1];
-        frienddata = data[0];
-    }
-    if (mydata.friendChats[friendid] != undefined) {
-        res.send({});
-    }
-    const mynewdata = {
-        unseen: 0,
-        name: frienddata.fullname,
-        chats: [],
-    }
-    const friendsnewdata = {
-        unseen: 0,
-        name: mydata.fullname,
-        chats: []
-    }
+    const {friendid, name} = req.query, {myid, fullname} = req.user;
+    const newFriendShip = new Chat({
+        friend1: JSON.stringify([myid, fullname, 0]),
+        friend2: JSON.stringify([friendid, name, 0])
+    });
+    const result = await newFriendShip.save();
     const result2 = await UserData.updateOne({_id: myid}, {
         $push : {
-            friends: JSON.stringify([friendid, frienddata.fullname, frienddata.status])
+            friends: JSON.stringify([friendid, name, result._id])
         }
     }, { useFindAndModify: false });
-    const result6 = await UserData.updateOne({_id: friendid}, {
-        $push : {
-            friends: JSON.stringify([myid, mydata.fullname, mydata.status])
-        }
-    }, { useFindAndModify: false });
-    console.log('accpting....');
-    const pata = {
-        ...mydata.friendChats,
-            friendid: mynewdata
-    }
-    const result = await UserData.updateOne({_id: myid}, {
-        $set : {
-            friendChats: pata
-        }
-    }, { useFindAndModify: false });
-    const pata1 = {
-        ...frienddata.friendChats,
-        myid: friendsnewdata
-    }
     const result1 = await UserData.updateOne({_id: friendid}, {
-        $set : {
-            friendChats: pata1
+        $push : {
+            friends: JSON.stringify([myid, fullname, result._id])
         }
     }, { useFindAndModify: false });
-    res.send({});
+    const result3 = await UserData.updateOne({_id: myid}, {
+        $pull : {
+            friendrequest: JSON.stringify([friendid, name])
+        }
+    }, { useFindAndModify: false });
+    res.send({})
 });
 
 routerFriend.patch('/massage', Authentication, async (req, res) => {
-    const {myid, friendid, message} = req.body;
-    const data = await UserData.find({$or: [{_id: myid}, {_id: friendid}]}).select({friendChats: true, newmessage: true});
-    let mydata, frienddata;
-    if (data[0]._id == myid) {
-        mydata = data[0];
-        frienddata = data[1];
+    const {messageid, message} = req.body, {myid} = req.user;
+    const result = await Chat.updateOne({_id: messageid}, {
+        $push: {
+            messages: JSON.stringify([myid, message])
+        }
+    });
+    const data = await Chat.findById(messageid).select({messages: false});
+    if (JSON.parse(data.friend1)[0] == myid) {
+        const temp = JSON.parse(data.friend2);
+        temp.splice(2, 1);
+        temp.push(JSON.parse(data.friend2)[2] + 1)
+        const result1 = await Chat.updateOne({_id: messageid}, {
+            $set: {
+                friend2: JSON.stringify(temp)
+            }
+        });
     } else {
-        mydata = data[1];
-        frienddata = data[0];
+        const temp = JSON.parse(data.friend1);
+        temp.splice(2, 1);
+        temp.push(JSON.parse(data.friend1)[2] + 1);
+        const result1 = await Chat.updateOne({_id: messageid}, {
+            $set: {
+                friend1: JSON.stringify(temp)
+            }
+        });
     }
-    mydata.friendChats[friendid][chats].push([0, message, Date.now()]);
-    const result = await UserData.updateOne({_id: myid}, {
-        $set: {
-            friendChats: mydata.friendChats
-        }
-    }, { useFindAndModify: false });
-    frienddata.friendChats[myid][chats].push([1, message, Date.now()]);
-    frienddata.friendChats[myid][unseen] += 1;
-    frienddata.newmessage.push(myid);
-    const result1 = await UserData.updateOne({_id: friendid}, {
-        $set: {
-            friendChats: frienddata.friendChats,
-            newmessage: frienddata.newmessage
-        }
-    }, { useFindAndModify: false }); 
-    res.send({isSend: true, friendname: frienddata.friendChats.name});
+    res.send({});
 })
 
 routerFriend.put('/friendmassage', Authentication, async (req, res) => {
