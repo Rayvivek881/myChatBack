@@ -53,7 +53,7 @@ routerLS.post('/login', async(req, res) =>{
     } else if (!await bcrypt.compare(password, result.password)) {
         res.send({isVarified: false, massage: 'password is not correct please forget password'});
     } else {
-        const token = await tokenobj.CreateToken(result._id);
+        const token = await tokenobj.CreateToken(result._id, result.fullname);
         let options = {
             maxAge: 1000 * 60 * 120,
             httpOnly: true,

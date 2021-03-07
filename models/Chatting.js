@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 const ChatSchema = mongoose.Schema({
     friend1: {
-        typeof: String, // [id, fullName, unseen] of first friend
+        type: String,
         required: true
     },
     friend2: {
-        typeof: String, //  [id, fullName, unseen] of secand friend
+        type: String,
         required: true
     },
     messages: {
-        typeof : Array, // every element of array should be [senderid, message]
+        type : Array,
         default: []
     }
 }, {timestamps: true});

@@ -2,7 +2,7 @@ const express = require("express");
 const routerFriend = new express.Router();
 const UserData = require('../models/auth');
 const Authentication = require('./middleware/authentication')
-const Chat = require('../models/Chatting');
+const Chat = require('../models/Chatting.js');
 
 routerFriend.get('/profile', async(req, res) => {
     const {username, isEditable} = req.body;
@@ -21,6 +21,8 @@ routerFriend.put('/friendreq', Authentication, async(req, res) => {
 
 routerFriend.put('/friendacc', Authentication, async (req, res) => {
     const {friendid, name} = req.query, {myid, fullname} = req.user;
+    console.log(req.query);
+    console.log(req.user);
     const newFriendShip = new Chat({
         friend1: JSON.stringify([myid, fullname, 0]),
         friend2: JSON.stringify([friendid, name, 0])
@@ -46,6 +48,7 @@ routerFriend.put('/friendacc', Authentication, async (req, res) => {
 
 routerFriend.patch('/massage', Authentication, async (req, res) => {
     const {messageid, message} = req.body, {myid} = req.user;
+    console.log(req.body);
     const result = await Chat.updateOne({_id: messageid}, {
         $push: {
             messages: JSON.stringify([myid, message])
@@ -65,7 +68,7 @@ routerFriend.patch('/massage', Authentication, async (req, res) => {
         const temp = JSON.parse(data.friend1);
         temp.splice(2, 1);
         temp.push(JSON.parse(data.friend1)[2] + 1);
-        const result1 = await Chat.updateOne({_id: messageid}, {
+        const result2 = await Chat.updateOne({_id: messageid}, {
             $set: {
                 friend1: JSON.stringify(temp)
             }
