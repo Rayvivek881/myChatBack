@@ -28,16 +28,7 @@ routerPost.get('/mypost/:id', async (req, res) => {
     console.log(req.params);
     const result = await UserData.findById(id)
         .select({ password: false, newmessage: false, friendrequest: false, email: false });
-    let getit = [];
-    for (let item in result.posts) {
-        getit.push({ _id: result.posts[item] });
-    }
-    if (getit.length == 0) res.send({ myposts: [], mydata: result });
-    else {
-        const myposts = await Post.find({ $or: getit });
-        console.log(myposts.length);
-        res.send({ myposts: myposts, mydata: result });
-    }
+    res.send({mydata: result });
 })
 
 routerPost.delete('/mypost', Authentication, async (req, res) => {
