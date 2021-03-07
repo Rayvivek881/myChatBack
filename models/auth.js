@@ -22,7 +22,7 @@ const loginSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        default: ''
+        default: 'hello i am using this site it very intersting'
     },
     friendChats: {
         type: Map,

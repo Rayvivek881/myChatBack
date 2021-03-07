@@ -6,7 +6,7 @@ const UserData = require('../models/auth');
 
 routerPost.post('/createpost', Authentication, async (req, res) => {
     const { myid } = req.user;
-    const {image, Title, data, name} = req.body;
+    const { image, Title, data, name } = req.body;
     const newpost = new Post({
         image,
         name,
@@ -15,70 +15,76 @@ routerPost.post('/createpost', Authentication, async (req, res) => {
         userid: myid
     });
     const result = await newpost.save();
-    const result1 = await UserData.updateOne({_id: myid}, {
-        $push : {
-            posts : result._id 
+    const result1 = await UserData.updateOne({ _id: myid }, {
+        $push: {
+            posts: result._id
         }
     }, { useFindAndModify: false });
-    res.send({message: 'post created'});
+    res.send({ message: 'post created' });
 })
 
-routerPost.get('/mypost/:id',  async (req, res) => {
+routerPost.get('/mypost/:id', async (req, res) => {
     const { id } = req.params;
-    const result = await UserData.findById(id).select({posts: true});
+    console.log(req.params);
+    const result = await UserData.findById(id)
+        .select({ password: false, newmessage: false, friendrequest: false, email: false });
     let getit = [];
     for (let item in result.posts) {
-        getit.push({_id: item});
+        getit.push({ _id: result.posts[item] });
     }
-    const myposts = await Post.find({$or: getit});
-    res.send({myposts: myposts});
+    if (getit.length == 0) res.send({ myposts: [], mydata: result });
+    else {
+        const myposts = await Post.find({ $or: getit });
+        console.log(myposts.length);
+        res.send({ myposts: myposts, mydata: result });
+    }
 })
 
 routerPost.delete('/mypost', Authentication, async (req, res) => {
     const { myid } = req.user, { postid } = req.query;
-    const result = await Post.deleteOne({_id: postid});
-    const result1 = await UserData.updateOne({_id: myid}, {
+    const result = await Post.deleteOne({ _id: postid });
+    const result1 = await UserData.updateOne({ _id: myid }, {
         $pull: {
             posts: postid
         }
     }, { useFindAndModify: false });
-    res.send({message: 'post deleted'});
+    res.send({ message: 'post deleted' });
 });
 
-routerPost.put('/like', Authentication, async(req, res) => {
+routerPost.put('/like', Authentication, async (req, res) => {
     const { myid } = req.user, { postid } = req.query;
-    const result = await Post.updateOne({_id: postid}, {
-        $push : {
+    const result = await Post.updateOne({ _id: postid }, {
+        $push: {
             likes: myid
         }
     }, { useFindAndModify: false });
     res.send({});
 })
 
-routerPost.put('/rmlike', Authentication, async(req, res) => {
+routerPost.put('/rmlike', Authentication, async (req, res) => {
     const { myid } = req.user, { postid } = req.query;
-    const result = await Post.updateOne({_id: postid}, {
-        $pull : {
+    const result = await Post.updateOne({ _id: postid }, {
+        $pull: {
             likes: myid
         }
     }, { useFindAndModify: false });
     res.send({});
 })
 
-routerPost.put('/comment', Authentication, async(req, res) => {
+routerPost.put('/comment', Authentication, async (req, res) => {
     const { myid } = req.user, { postid, data } = req.body;
-    const result = await Post.updateOne({_id: postid}, {
-        $push : {
+    const result = await Post.updateOne({ _id: postid }, {
+        $push: {
             Comments: [myid, data]
         }
     }, { useFindAndModify: false });
     res.send({});
 })
 
-routerPost.put('/rmcomment', Authentication, async(req, res) => {
+routerPost.put('/rmcomment', Authentication, async (req, res) => {
     const { myid } = req.user, { postid, data } = req.body;
-    const result = await Post.updateOne({_id: postid}, {
-        $pull : {
+    const result = await Post.updateOne({ _id: postid }, {
+        $pull: {
             Comments: [myid, data]
         }
     }, { useFindAndModify: false });
@@ -86,19 +92,19 @@ routerPost.put('/rmcomment', Authentication, async(req, res) => {
 })
 
 routerPost.patch('/editpost', Authentication, async (req, res) => {
-    const {image, Title, data, postid} = req.body;
-    const result = await Post.updateOne({_id: postid}, {
+    const { image, Title, data, postid } = req.body;
+    const result = await Post.updateOne({ _id: postid }, {
         $set: {
             image,
             Title,
             data
         }
     }, { useFindAndModify: false });
-    res.send({message: 'post edited'})
+    res.send({ message: 'post edited' })
 });
 
-routerPost.post('/allposts', async(req, res) => {
+routerPost.post('/allposts', async (req, res) => {
     const result = await Post.find();
-    res.send({allposts: result});
+    res.send({ allposts: result });
 })
 module.exports = routerPost;
