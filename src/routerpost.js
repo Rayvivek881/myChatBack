@@ -20,7 +20,7 @@ routerPost.post('/createpost', Authentication, async (req, res) => {
             posts: result._id
         }
     }, { useFindAndModify: false });
-    res.send({ message: 'post created' });
+    res.send({ message: 'post created', newpost: result});
 })
 
 routerPost.get('/mypost/:id', async (req, res) => {
@@ -91,11 +91,11 @@ routerPost.patch('/editpost', Authentication, async (req, res) => {
             data
         }
     }, { useFindAndModify: false });
-    res.send({ message: 'post edited' })
+    res.send({ message: 'post edited' });
 });
 
 routerPost.post('/allposts', async (req, res) => {
-    const result = await Post.find();
+    const result = await Post.find().sort({updatedAt: -1});
     res.send({ allposts: result });
 })
 module.exports = routerPost;

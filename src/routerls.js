@@ -72,8 +72,9 @@ routerLS.get('/logout', (req, res) => {
     res.send({done: true});
 })
 
-routerLS.get('/forgetpass', async (req, res) =>{
+routerLS.post('/forgetpass', async (req, res) =>{
     const { emailorusername } = req.body;
+    console.log(req.body);
     let result, flag;
     if (emailorusername.indexOf('@') != -1) {
         result = await UserData.findOne({email: Cryption.Encryption(emailorusername)}).select({email: true, fullname: true});
@@ -125,4 +126,16 @@ routerLS.post('/home',Authentication, async(req, res) => {
     res.send({isVarified: true, data: obj});
 });
 
+routerLS.put('/editprofile', Authentication, async (req, res) => {
+    const {myid} = res.user;
+    const {image, status, fullname} = res.body;
+    const update = await UserData.updateOne({_id: myid}, {
+        $set: {
+            image,
+            fullname,
+            status
+        }
+    }, { useFindAndModify: false })
+    res.send({message: 'your profile has updated'})
+})
 module.exports = routerLS;
