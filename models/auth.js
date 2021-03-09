@@ -43,6 +43,10 @@ const loginSchema = mongoose.Schema({
     friends: {
         type: Array,
         default: []
+    },
+    groups: {
+        type: Array,
+        default: []
     }
 }, {timestamps: true});
 const UserData = mongoose.model('UserData', loginSchema);

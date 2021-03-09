@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const UserData = require('../models/auth')
 const Post = require('../models/Post')
 const routerLS = require('./routerls')
+const routerGC = require('./routergc')
 const routerFriend = require('./rourterfriend');
 const routersearch = require('./routerSearch')
 const routerPost = require('./routerpost')
@@ -27,6 +28,7 @@ app.use(routerLS);
 app.use(routerFriend);
 app.use(routersearch);
 app.use(routerPost);
+app.use(routerGC);
 
 app.listen(port, () => { 
     console.log(`we are working port ${port}`);
