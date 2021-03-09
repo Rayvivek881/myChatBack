@@ -25,8 +25,34 @@ routerGC.get('/groupreq', Authentication, async(req, res) => {
         $push: {
             requests: JSON.stringify([myid, fullname])
         }
-    });
+    }, { useFindAndModify: false });
     res.send({});
 })
 
-module.exports = routerGC;
+
+routerGC.get('/addmember', Authentication, async(req, res) => {
+    const {myid, fullname} = req.user;
+    const {groupid, friendid, name, groupName} = req.body;
+    const result = await GroupChat.updateOne({_id: groupid}, {
+        $pull: {
+            requests: JSON.stringify([friendid, name])
+        }
+    }, { useFindAndModify: false });
+    const result1 = await GroupChat.updateOne({_id: groupid}, {
+        $push: {
+            members: JSON.stringify([friendid, name])
+        }
+    }, { useFindAndModify: false });
+    const result2 = await UserData.updateOne({_id: friendid}, {
+        $push: {
+            groupid: JSON.stringify([groupid, groupName])
+        }
+    }, { useFindAndModify: false });
+    res.send({}); 
+})
+
+routerGC.get('/groupquery/:groupid', Authentication, async(req, res) => {
+    const result = await GroupChat.findById(req.params.groupid);
+    res.send({result: result})
+})
+module.exports = routerGC; 
