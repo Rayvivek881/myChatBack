@@ -6,6 +6,7 @@ const UserData = require('../models/auth');
 
 routerGC.get('/creategroup', Authentication, async (req, res) => {
     const {myid, fullname} = req.user, {groupName} = req.query;
+    console.log(req.query);
     const newGroup = GroupChat({
         groupName: groupName,
         Admin: JSON.stringify([fullname, myid]),
@@ -54,5 +55,21 @@ routerGC.get('/addmember', Authentication, async(req, res) => {
 routerGC.get('/groupquery/:groupid', Authentication, async(req, res) => {
     const result = await GroupChat.findById(req.params.groupid);
     res.send({result: result})
+});
+
+routerGC.get('quitgroup', Authentication, async (req, res) => {
+    const {myid, fullname} = req.user, {groupid, groupNmae} = req.query;
+    const result = await GroupChat.updateOne({_id: groupid}, {
+        $pull: {
+            members: JSON.stringify([myid, fullname])
+        }
+    });
+    const result1 = await UserData.updateOne({_id: myid}, {
+        $pull: {
+            groups: JSON.stringify([groupid, groupNmae])
+        }
+    });
+    res.send({});
 })
+
 module.exports = routerGC; 

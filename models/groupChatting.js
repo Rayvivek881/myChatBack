@@ -4,6 +4,14 @@ const GroupChatSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    image: {
+        type: String,
+        default: null
+    },
+    status: {
+        type: String,
+        default: 'friends with benifits'
+    },
     Admin: {
         type: String, // [name, id]
         required: true

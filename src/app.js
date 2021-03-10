@@ -11,7 +11,6 @@ const routerPost = require('./routerpost')
 const cookieParser = require('cookie-parser');
 const {MONGOURI} = require('./keys.js');
 const port = process.env.PORT || 8000;
-var bodyParser = require('body-parser');
 
 
 mongoose.connect(MONGOURI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -20,8 +19,6 @@ mongoose.connect(MONGOURI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 app.use(express.json({limit: "50mb"}));
 app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.json({limit: "50mb"}));
-app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 app.use(cookieParser());
 
 app.use(routerLS);

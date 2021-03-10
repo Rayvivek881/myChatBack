@@ -1,4 +1,4 @@
-import {skey} from '../keys'
+const skey = 98;
 const Encryption = (data) => {
     let newData = [];
     for (let i = 0; i < data.length; i++) {
