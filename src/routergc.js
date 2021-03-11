@@ -42,7 +42,7 @@ routerGC.get('/addmember', Authentication, async(req, res) => {
     const result1 = await GroupChat.updateOne({_id: groupid}, {
         $push: {
             members: JSON.stringify([friendid, name])
-        }
+        } 
     }, { useFindAndModify: false });
     const result2 = await UserData.updateOne({_id: friendid}, {
         $push: {
@@ -71,5 +71,14 @@ routerGC.get('quitgroup', Authentication, async (req, res) => {
     });
     res.send({});
 })
+
+routerGC.post('/sendgm', Authentication, async(req, res) => {
+    const {messageid, message} = req.body, {myid, fullname} = req.user;
+    const result = await GroupChat.updateOne({_id: messageid}, {
+        $push: {
+            messages: JSON.stringify([myid, fullname, message])
+        }
+    })
+});
 
 module.exports = routerGC; 
