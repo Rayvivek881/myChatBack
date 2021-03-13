@@ -17,7 +17,7 @@ routerPost.post('/createpost', Authentication, async (req, res) => {
     const result = await newpost.save();
     const result1 = await UserData.updateOne({ _id: myid }, {
         $push: {
-            posts: result._id
+            posts: result._id.toString()
         }
     }, { useFindAndModify: false });
     res.send({ message: 'post created', newpost: result});
@@ -31,9 +31,9 @@ routerPost.get('/mypost/:id', async (req, res) => {
     res.send({mydata: result });
 })
 
-routerPost.delete('/mypost', Authentication, async (req, res) => {
+routerPost.patch('/mypost', Authentication, async (req, res) => {
     const { myid } = req.user, { postid } = req.query;
-    const result = await Post.deleteOne({ _id: postid });
+    const result = await Post.findByIdAndRemove({ _id: postid });
     const result1 = await UserData.updateOne({ _id: myid }, {
         $pull: {
             posts: postid

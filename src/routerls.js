@@ -59,7 +59,8 @@ routerLS.post('/login', async(req, res) =>{
             httpOnly: true,
         }
         res.cookie('user_id', token , options)
-        res.send({isVarified: true, massage: 'found'});
+        console.log(result);
+        res.send({isVarified: true, massage: 'found', data: result});
     }
 });
 
