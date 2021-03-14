@@ -22,7 +22,8 @@ routerGC.get('/creategroup', Authentication, async (req, res) => {
 
 routerGC.get('/groupreq', Authentication, async(req, res) => {
     const {myid, fullname} = req.user, {groupid} = req.query;
-    const result = await GroupChat.updateOne({id: groupid}, {
+    console.log(req.query);
+    const result = await GroupChat.updateOne({_id: groupid}, {
         $push: {
             requests: JSON.stringify([myid, fullname])
         }
@@ -68,18 +69,19 @@ routerGC.get('/groupquery/:groupid', Authentication, async(req, res) => {
     res.send({result: result})
 });
 
-routerGC.get('quitgroup', Authentication, async (req, res) => {
+routerGC.get('/quitgroup', Authentication, async (req, res) => {
     const {myid, fullname} = req.user, {groupid, groupNmae} = req.query;
+    console.log('quiting......');
     const result = await GroupChat.updateOne({_id: groupid}, {
         $pull: {
             members: JSON.stringify([myid, fullname])
         }
-    });
+    }, { useFindAndModify: false });
     const result1 = await UserData.updateOne({_id: myid}, {
         $pull: {
             groups: JSON.stringify([groupid, groupNmae])
         }
-    });
+    }, { useFindAndModify: false });
     res.send({});
 })
 
@@ -89,7 +91,32 @@ routerGC.post('/sendgm', Authentication, async(req, res) => {
         $push: {
             messages: JSON.stringify([myid, fullname, message])
         }
-    })
+    },{ useFindAndModify: false })
+    res.send({});
 });
+
+routerGC.get('/rmmember', Authentication, async(req, res) => { 
+    const {myid, fullname} = req.user, {groupid, member} = req.query;
+    console.log(req.query);
+    const result = await GroupChat.updateOne({_id: groupid}, {
+        $pull: {
+            members: member
+        }
+    }, { useFindAndModify: false })
+    res.send({});
+});
+
+routerGC.post('/editgroup', async(req, res) => {
+    const {groupName, image, status, groupid} = req.body;
+    console.log(req.body);
+    const result = await GroupChat.updateOne({_id: groupid}, {
+        $set: {
+            groupName: groupName,
+            image: image,
+            status: status
+        }
+    }, { useFindAndModify: false });
+    res.send({})
+})
 
 module.exports = routerGC; 

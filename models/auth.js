@@ -34,7 +34,7 @@ const loginSchema = mongoose.Schema({
     },
     newmessage: {
         type: Array,
-        default: []
+        default: [] 
     },
     posts: {
         type: Array,

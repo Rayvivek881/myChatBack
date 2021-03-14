@@ -45,7 +45,6 @@ routerLS.patch('/signup', async(req, res) =>{
 });
 
 routerLS.post('/login', async(req, res) =>{
-    console.log(req.body);
     const {username, password} = req.body;
     const result = await UserData.findOne({username: username});
     if(result == null) {
@@ -59,7 +58,6 @@ routerLS.post('/login', async(req, res) =>{
             httpOnly: true,
         }
         res.cookie('user_id', token , options)
-        console.log(result);
         res.send({isVarified: true, massage: 'found', data: result});
     }
 });
@@ -128,8 +126,9 @@ routerLS.post('/home',Authentication, async(req, res) => {
 });
 
 routerLS.put('/editprofile', Authentication, async (req, res) => {
-    const {myid} = res.user;
-    const {image, status, fullname} = res.body;
+    const {myid} = req.user;
+    console.log(req.body);
+    const {image, status, fullname} = req.body;
     const update = await UserData.updateOne({_id: myid}, {
         $set: {
             image,
