@@ -27,7 +27,7 @@ routerPost.get('/mypost/:id', async (req, res) => {
     const { id } = req.params;
     console.log(req.params);
     const result = await UserData.findById(id)
-        .select({ password: false, newmessage: false, friendrequest: false, email: false });
+        .select({ password: false, friendrequest: false, email: false });
     res.send({mydata: result });
 })
 
@@ -43,12 +43,20 @@ routerPost.patch('/mypost', Authentication, async (req, res) => {
 });
 
 routerPost.put('/like', Authentication, async (req, res) => {
-    const { myid } = req.user, { postid } = req.query;
+    const { myid, fullname } = req.user, { postid, userid } = req.query;
+    console.log(req.query);
     const result = await Post.updateOne({ _id: postid }, {
         $push: {
             likes: myid
         }
     }, { useFindAndModify: false });
+    const result1 = await UserData.updateOne({_id: userid}, {
+        $push: {
+            notifications: JSON.stringify([userid, `${fullname} has liked your post 
+            you can watch his profile by clicking on me`])
+        },
+        $inc: {newnotifications: 1}
+    }, { useFindAndModify: false })
     res.send({});
 })
 
@@ -63,21 +71,26 @@ routerPost.put('/rmlike', Authentication, async (req, res) => {
 })
 
 routerPost.put('/comment', Authentication, async (req, res) => {
-    const { myid } = req.user, { postid, data } = req.body;
+    const { myid } = req.user, { postid, data, userid} = req.body;
     const result = await Post.updateOne({ _id: postid }, {
         $push: {
             Comments: [myid, data]
         }
     }, { useFindAndModify: false });
+    const result1 = await UserData.updateOne({_id: userid}, {
+        $push: {
+            notifications: JSON.stringify([userid, `${fullname} has commented in your post 
+            you can watch his profile by clicking on me`])
+        },
+        $inc: {newnotifications: 1}
+    }, { useFindAndModify: false })
     res.send({});
 })
 
 routerPost.put('/rmcomment', Authentication, async (req, res) => {
     const { myid } = req.user, { postid, data } = req.body;
     const result = await Post.updateOne({ _id: postid }, {
-        $pull: {
-            Comments: [myid, data]
-        }
+        $pull: { Comments: [myid, data] }
     }, { useFindAndModify: false });
     res.send({});
 })

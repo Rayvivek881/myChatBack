@@ -33,8 +33,12 @@ const loginSchema = mongoose.Schema({
         default: []
     },
     newmessage: {
-        type: Array,
-        default: [] 
+        type: Number,
+        default: 0 
+    },
+    newnotifications: {
+        type: Number,
+        default: 0 
     },
     posts: {
         type: Array,
@@ -45,6 +49,10 @@ const loginSchema = mongoose.Schema({
         default: []
     },
     groups: {
+        type: Array,
+        default: []
+    }, 
+    notifications: {
         type: Array,
         default: []
     }

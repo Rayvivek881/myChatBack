@@ -11,7 +11,7 @@ routersearch.post('/search', async (req, res) => {
     for (let index = 0; index < result.length; index++) {
         if (IsOkName(search, result[index].fullname)) {
             data.push(result[index]);
-        }
+        } 
     }
     let data1 = [];
     const result1 = await GroupChat.find().select({groupName: true});

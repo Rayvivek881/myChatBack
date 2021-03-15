@@ -101,7 +101,7 @@ routerLS.patch('/forgetpass', async(req, res) =>{
     if (isemail) {
         result = await UserData.updateOne({email: Cryption.Encryption(emailorusername)}, {
             $set: {
-                password: hashedpassword
+                password: hashedpassword 
             }
         }, { useFindAndModify: false });
     }
@@ -129,7 +129,7 @@ routerLS.put('/editprofile', Authentication, async (req, res) => {
     const {myid} = req.user;
     console.log(req.body);
     const {image, status, fullname} = req.body;
-    const update = await UserData.updateOne({_id: myid}, {
+    const update = await UserData.updateOne({_id: myid}, { 
         $set: {
             image,
             fullname,

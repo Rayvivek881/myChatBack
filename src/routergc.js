@@ -9,7 +9,7 @@ routerGC.get('/creategroup', Authentication, async (req, res) => {
     console.log(req.query);
     const newGroup = GroupChat({
         groupName: groupName,
-        Admin: JSON.stringify([fullname, myid]),
+        Admin: JSON.stringify([fullname, myid]), 
     });
     const result = await newGroup.save();
     const result1 = await UserData.updateOne({_id: myid}, {
@@ -23,21 +23,33 @@ routerGC.get('/creategroup', Authentication, async (req, res) => {
 routerGC.get('/groupreq', Authentication, async(req, res) => {
     const {myid, fullname} = req.user, {groupid} = req.query;
     console.log(req.query);
+    const data = await GroupChat.findById(groupid).select({Admin: true, groupName: true})
     const result = await GroupChat.updateOne({_id: groupid}, {
-        $push: {
+        $addToSet: {
             requests: JSON.stringify([myid, fullname])
         }
     }, { useFindAndModify: false });
+    const result1 = await UserData.updateOne({_id: JSON.parse(data.Admin)[1]}, {
+        $push: {
+            notifications: JSON.stringify([myid, `${fullname} has sent you a group Add request 
+            for ${data.groupName} you can watch his profile by clicking on me`])
+        },
+        $inc: {newnotifications: 1}
+    })
     res.send({});
-})
+}) 
 
 routerGC.get('/addgroupreq', Authentication, async(req, res) => {
-    const {groupid, friendid, name, groupName} = req.query;
+    const {groupid, friendid, name, groupName, Adminid} = req.query;
     const result = await GroupChat.updateOne({id: groupid}, {
         $push: {
             requests: JSON.stringify([friendid, name])
         }
     }, { useFindAndModify: false });
+    const result1 = await UserData.updateOne({_id: JSON.parse(Adminid)[1]}, {
+        $inc: {newnotifications: 1},
+        $push: {notifications: JSON.stringify([friendid, `${name} has send you to group add request you can watch his profile by clicking on me`])}
+    })
     res.send({});
 })
 
@@ -48,16 +60,16 @@ routerGC.put('/addmember', Authentication, async(req, res) => {
     const result = await GroupChat.updateOne({_id: groupid}, {
         $pull: {
             requests: JSON.stringify([friendid, name])
-        }
-    }, { useFindAndModify: false });
-    const result1 = await GroupChat.updateOne({_id: groupid}, {
+        }, 
         $push: {
             members: JSON.stringify([friendid, name])
-        } 
+        }
     }, { useFindAndModify: false });
     const result2 = await UserData.updateOne({_id: friendid}, {
         $push: {
-            groups: JSON.stringify([groupid, groupName])
+            groups: JSON.stringify([groupid, groupName]),
+            notifications: JSON.stringify([myid, `you have add in group ${groupName} by the admin of this group
+            you can watch his profile`])
         }
     }, { useFindAndModify: false });
     res.send({}); 
@@ -91,7 +103,7 @@ routerGC.post('/sendgm', Authentication, async(req, res) => {
         $push: {
             messages: JSON.stringify([myid, fullname, message])
         }
-    },{ useFindAndModify: false })
+    },{ useFindAndModify: false });
     res.send({});
 });
 
@@ -102,7 +114,7 @@ routerGC.get('/rmmember', Authentication, async(req, res) => {
         $pull: {
             members: member
         }
-    }, { useFindAndModify: false })
+    }, { useFindAndModify: false });
     res.send({});
 });
 
