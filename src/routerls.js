@@ -28,6 +28,10 @@ routerLS.post('/signup', async(req, res) =>{
     res.send({isVarified: true, val: val, massage: `email varification OTP`});
 });
 
+routerLS.get('/hello', async (req, res) => {
+    res.send({isVarified: true,  massage: `everything is up`});
+})
+
 routerLS.patch('/signup', async(req, res) =>{
     const {fullname, image, username, email, password } = req.body;
     const hashedpassword = await bcrypt.hash(password, 12);
