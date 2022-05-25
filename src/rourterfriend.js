@@ -14,12 +14,14 @@ routerFriend.get('/profile', async (req, res) => {
 routerFriend.put('/friendreq', Authentication, async (req, res) => {
     const { myid, fullname } = req.user;
     const { friendid } = req.query;
+    console.log(req.user, req.query);
     const result = await UserData.updateOne({ _id: friendid }, {
         $addToSet: {friendrequest: JSON.stringify([myid, fullname]) },
-        $addToSet: {notifications: JSON.stringify([myid, `${fullname} has sent you a friend request
+        $push: {notifications: JSON.stringify([myid, `${fullname} has sent you a friend request
                         you can watch his profile by clicking on me`]) },
         $inc: {newnotifications: 1}  
     }, { useFindAndModify: false })
+    console.log("done.............", result);
     res.send({ status: 'added' });
 })
 
@@ -168,7 +170,7 @@ routerFriend.delete('/friendreq', Authentication, async (req, res) => {
 
 routerFriend.post('/prevmessage', Authentication, async (req, res) => {
     const result = await Chat.findById(req.body.mid);
-    if (result == null) {
+    if (result === null) {
         const result1 = await GroupChat.findById(req.body.mid);
         console.log(result1);
         res.send({ result: result1 });

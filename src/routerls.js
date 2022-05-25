@@ -5,7 +5,6 @@ const isOkEmail = require('./middleware/Emailvarification');
 const bcrypt = require('bcryptjs');
 const tokenobj = require('./middleware/jwt');
 const Authentication = require('./middleware/authentication');
-const Post = require("../models/Post");
 const Cryption = require('./middleware/encryption');
 
 routerLS.post('/signup', async(req, res) =>{
@@ -120,7 +119,7 @@ routerLS.post('/home',Authentication, async(req, res) => {
     const result = await UserData.findById(myid).select({password: false, friendChats: false, email: false});
     const obj = {
         ...result,
-        newmessage: result.newmessage.length,
+        newmessage: result?.newmessage.length,
     }
     res.send({isVarified: true, data: obj});
 });

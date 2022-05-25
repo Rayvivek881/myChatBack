@@ -61,7 +61,7 @@ routerGC.put('/addmember', Authentication, async(req, res) => {
         $pull: {
             requests: JSON.stringify([friendid, name])
         }, 
-        $push: {
+        $addToSet: {
             members: JSON.stringify([friendid, name])
         }
     }, { useFindAndModify: false });
