@@ -27,5 +27,4 @@ app.use(routerPost);
 app.use(routerGC);
 app.use(cors());
 
-
 app.listen(port, () => { console.log(`we are working port ${port}`); });
